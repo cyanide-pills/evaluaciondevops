@@ -26,7 +26,7 @@ jobs:
 
     - name: Build imagen Backend y push a ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: backend_despachos
         IMAGE_TAG: latest
       run: |

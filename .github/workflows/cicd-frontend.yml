@@ -26,7 +26,7 @@ jobs:
 
     - name: Build imagen Frontend y push a ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: front_despachos
         IMAGE_TAG: latest
       run: |
@@ -50,3 +50,4 @@ jobs:
             "docker run -d --name front_despachos -p 80:80 ${{ secrets.ECR_REGISTRY }}/front_despachos:latest"
           ]}' \
           --output text
+
