@@ -8,7 +8,7 @@ jobs:
   build-push-deploy-database:
     runs-on: ubuntu-latest
 
-    steps:
+  * steps:
     - name: Checkout código
       uses: actions/checkout@v3
 
@@ -43,10 +43,10 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
-            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REGISTRY }}/db:latest",
+            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 206916371090.dkr.ecr.us-east-1.amazonaws.com",
+            "docker pull 206916371090.dkr.ecr.us-east-1.amazonaws.com/db:latest",
             "docker stop db || true",
             "docker rm db || true",
-            "docker run -d --name db -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} -e MYSQL_DATABASE=despacho_db -e MYSQL_USER=${{ secrets.DB_USER }} -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} ${{ secrets.ECR_REGISTRY }}/db:latest"
+            "docker run -d --name db -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} -e MYSQL_DATABASE=despacho_db -e MYSQL_USER=${{ secrets.DB_USER }} -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} 206916371090.dkr.ecr.us-east-1.amazonaws.com/db:latest"
           ]}' \
           --output text
