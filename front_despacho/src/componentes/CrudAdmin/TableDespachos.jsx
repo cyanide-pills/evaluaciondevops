@@ -66,21 +66,23 @@ export const TableDespachos = () => {
                     <td className="pr-10 py-10  items-center">
                       {despacho.patenteCamion}
                     </td>
-                    <td className="pr-10 py-10  items-center">
-                      {despacho.entregado
-                        ? "Despacho entregado"
+                    <td className="pr-10 py-10 items-center">
+                      {despacho.entregado // Or despacho.entregado depending on what your backend maps
+                        ? "Despacho realizado"
                         : "Despacho pendiente"}
                     </td>
                     <td className="pr-10 py-10  items-center">
                       {despacho.intento}
                     </td>
                     <td>
-                      <button
-                        onClick={() => handleAbrirModal(despacho)}
-                        className="py-1 bg-orange-200 px-8 rounded-xl shadow-md hover:bg-orange-300/70 transition-all duration-300 "
-                      >
-                        Cerrar despacho
-                      </button>
+                      {!despacho.despachado && (
+                        <button
+                          onClick={() => handleAbrirModal(despacho)}
+                          className="py-1 bg-orange-200 px-8 rounded-xl shadow-md hover:bg-orange-300/70 transition-all duration-300"
+                        >
+                          Cerrar despacho
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
