@@ -67,7 +67,7 @@ export const TableDespachos = () => {
                       {despacho.patenteCamion}
                     </td>
                     <td className="pr-10 py-10 items-center">
-                      {despacho.entregado // Or despacho.entregado depending on what your backend maps
+                      {despacho.despachado // Or despacho.entregado depending on what your backend maps
                         ? "Despacho realizado"
                         : "Despacho pendiente"}
                     </td>
