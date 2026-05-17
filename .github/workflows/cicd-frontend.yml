@@ -31,7 +31,8 @@ jobs:
         IMAGE_TAG: latest
       run: |
         cd front_despacho
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # Added --no-cache to pull fresh node modules and completely re-compile Vite/Webpack
+        docker build --no-cache -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Desplegar Frontend vía SSM
