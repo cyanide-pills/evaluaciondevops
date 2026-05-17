@@ -27,7 +27,7 @@ jobs:
     - name: Build imagen Backend y push a ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: despacho-backend
+        ECR_REPOSITORY: backend_despachos
         IMAGE_TAG: latest
       run: |
         cd back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
@@ -39,14 +39,14 @@ jobs:
         aws ssm send-command \
           --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
           --document-name "AWS-RunShellScript" \
-          --comment "Actualizar despacho-backend desde ECR" \
+          --comment "Actualizar backend_despachos desde ECR" \
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
             "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REGISTRY }}/despacho-backend:latest",
-            "docker stop despacho-backend || true",
-            "docker rm despacho-backend || true",
-            "docker run -d --name despacho-backend -p 8080:8080 -e DB_HOST=${{ secrets.DATABASE_EC2_IP }} -e DB_PORT=3306 -e DB_NAME=despacho_db -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.MYSQL_PASSWORD }} ${{ secrets.ECR_REGISTRY }}/despacho-backend:latest"
+            "docker pull ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest",
+            "docker stop backend_despachos || true",
+            "docker rm backend_despachos || true",
+            "docker run -d --name backend_despachos -p 8080:8080 -e DB_HOST=${{ secrets.DATABASE_EC2_IP }} -e DB_PORT=3306 -e DB_NAME=despacho_db -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.MYSQL_PASSWORD }} ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest"
           ]}' \
           --output text

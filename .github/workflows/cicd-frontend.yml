@@ -27,10 +27,10 @@ jobs:
     - name: Build imagen Frontend y push a ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: despacho-frontend
+        ECR_REPOSITORY: front-despachos
         IMAGE_TAG: latest
       run: |
-        cd front_despacho
+        cd front_despachos
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
@@ -39,14 +39,14 @@ jobs:
         aws ssm send-command \
           --instance-ids ${{ secrets.EC2_FRONTEND_INSTANCE_ID }} \
           --document-name "AWS-RunShellScript" \
-          --comment "Actualizar despacho-frontend desde ECR" \
+          --comment "Actualizar front-despachos desde ECR" \
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
             "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REGISTRY }}/despacho-frontend:latest",
-            "docker stop despacho-frontend || true",
-            "docker rm despacho-frontend || true",
-            "docker run -d --name despacho-frontend -p 80:80 ${{ secrets.ECR_REGISTRY }}/despacho-frontend:latest"
+            "docker pull ${{ secrets.ECR_REGISTRY }}/front-despachos:latest",
+            "docker stop front-despachos || true",
+            "docker rm front-despachos || true",
+            "docker run -d --name front-despachos -p 80:80 ${{ secrets.ECR_REGISTRY }}/front-despachos:latest"
           ]}' \
           --output text
