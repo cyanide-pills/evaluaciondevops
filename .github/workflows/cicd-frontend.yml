@@ -39,7 +39,7 @@ jobs:
         aws ssm send-command \
           --instance-ids ${{ secrets.EC2_FRONTEND_INSTANCE_ID }} \
           --document-name "AWS-RunShellScript" \
-          --comment "Actualizar front_despachos desde ECR" \
+          --comment "Actualizar front_despachos desde ECR." \
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
