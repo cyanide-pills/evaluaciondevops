@@ -6,42 +6,38 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
-    console.log("onSubmit ejecutado");
-    
-    // 1. Convert form string inputs to the numeric/boolean types Hibernate expects
+    // Build the complete object structure so Spring Boot doesn't save null values
     const jsonData = {
+      idDespacho: despacho.idDespacho,
+      idCompra: despacho.idCompra,
+      direccionCompra: despacho.direccionCompra,
+      fechaDespacho: despacho.fechaDespacho,
+      patenteCamion: despacho.patenteCamion,
+      valorCompra: despacho.valorCompra,
+      
+      // Updated attributes from form inputs
       intento: parseInt(data.intento, 10),
-      despachado: data.despachado === "true" || data.despachado === true, 
+      despachado: data.despachado === "true" || data.despachado === true
     };
 
-    console.log("Datos del formulario enviados al Backend:", jsonData);
-
     try {
-      // 2. Safely capture the correct database ID property reference
-      const targetId = despacho.idDespacho || despacho.id_despacho;
-
-      await axios.put(
-        `/api/v1/despachos/${targetId}`,
-        jsonData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
+      await axios.put(`/api/v1/despachos/${despacho.idDespacho}`, jsonData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      );
+      });
       
-      await Swal.fire({
+      Swal.fire({
         title: "Despacho modificado 🛻!",
         text: "El despacho ha sido modificado exitosamente",
         icon: "success",
         confirmButtonText: "Aceptar",
       });
     } catch (error) {
-      console.error("Error en la solicitud PUT:", error);
+      console.error("Error executing PUT request:", error);
     }
     
-    // This will now execute safely and close the modal window view
     onClose();
   };
 
