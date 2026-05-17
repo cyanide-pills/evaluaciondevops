@@ -24,3 +24,21 @@ CREATE TABLE IF NOT EXISTS usuario (
 -- Grant privileges to despacho_user
 GRANT ALL PRIVILEGES ON despacho_db.* TO 'despacho_user'@'%';
 FLUSH PRIVILEGES;
+
+
+
+-- ==========================================
+-- Insert Dummy Data for 'usuario' table
+-- ==========================================
+INSERT INTO usuario (nombre, email, rol) VALUES
+('Juan Pérez', 'juan.perez@example.com', 'Administrador'),
+('María Gómez', 'maria.gomez@example.com', 'Operador'),
+('Carlos Plaza', 'carlos.plaza@example.com', 'Repartidor');
+
+-- ==========================================
+-- Insert Dummy Data for 'despacho' table
+-- ==========================================
+INSERT INTO despacho (nombre, descripcion, estado) VALUES
+('Despacho Norte #101', 'Envío prioritario de equipos electrónicos a sucursal norte.', 'En Proceso'),
+('Despacho Centro #204', 'Entrega de documentación legal de contratos anuales.', 'Pendiente'),
+('Despacho Sur #55', 'Despacho rutinario de suministros de oficina.', 'Completado');
