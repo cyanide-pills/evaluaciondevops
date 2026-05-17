@@ -48,5 +48,5 @@ jobs:
             "sudo docker stop backend_despachos || true",
             "sudo docker rm backend_despachos || true",
             "sudo docker run -d --name backend_despachos -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DATABASE_EC2_IP }} -e DB_PORT=3306 -e DB_NAME=despacho_db -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.MYSQL_PASSWORD }} 206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest"
-          ]}'
+          ]}' \
           --output text
