@@ -3,9 +3,6 @@ name: CI/CD Proyecto Semestral - Database
 on:
   push:
     branches: [ "deploy" ]
-    paths:
-      - "db/**"
-      - ".github/workflows/cicd-database.yml"
 
 jobs:
   build-push-deploy-database:

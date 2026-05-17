@@ -3,9 +3,6 @@ name: CI/CD Proyecto Semestral - Frontend
 on:
   push:
     branches: [ "deploy" ]
-    paths:
-      - "front_despacho/**"
-      - ".github/workflows/cicd-frontend.yml"
 
 jobs:
   build-push-deploy-frontend:
