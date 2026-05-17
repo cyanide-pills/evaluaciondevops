@@ -24,7 +24,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
       id: login-ecr
 
-    - name: Build imagen Frontend y push a ECR
+    - name: Build imagen de Frontend y push a ECR
       env:
         ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: front_despachos
