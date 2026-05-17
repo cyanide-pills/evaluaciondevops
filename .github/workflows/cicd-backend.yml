@@ -2,7 +2,7 @@ name: CI/CD Proyecto Semestral - Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "deploy" ]
     paths:
       - "back-Despachos_SpringBoot/**"
       - ".github/workflows/cicd-backend.yml"
