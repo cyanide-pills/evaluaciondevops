@@ -6,7 +6,13 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data) => {
-    // Build the complete object structure so Spring Boot doesn't save null values
+    console.log("Valores crudos del formulario:", data);
+    
+    // 1. Explicitly cast data values to match database data types exactly
+    const despachadoBoolean = data.despachado === "true" || data.despachado === true;
+    const intentoInteger = parseInt(data.intento, 10);
+
+    // 2. Build the complete object structure so nothing drops out
     const jsonData = {
       idDespacho: despacho.idDespacho,
       idCompra: despacho.idCompra,
@@ -15,29 +21,37 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
       patenteCamion: despacho.patenteCamion,
       valorCompra: despacho.valorCompra,
       
-      // Updated attributes from form inputs
-      intento: parseInt(data.intento, 10),
-      despachado: data.despachado === "true" || data.despachado === true
+      // Inject our properly formatted variables here
+      intento: intentoInteger,
+      despachado: despachadoBoolean
     };
 
+    console.log("Payload final enviado por PUT:", jsonData);
+
     try {
-      await axios.put(`/api/v1/despachos/${despacho.idDespacho}`, jsonData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      await axios.put(
+        `/api/v1/despachos/${despacho.idDespacho}`,
+        jsonData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
-      });
+      );
       
-      Swal.fire({
+      await Swal.fire({
         title: "Despacho modificado 🛻!",
         text: "El despacho ha sido modificado exitosamente",
         icon: "success",
         confirmButtonText: "Aceptar",
       });
     } catch (error) {
-      console.error("Error executing PUT request:", error);
+      console.error("Error ejecutando la actualización PUT:", error);
     }
     
+    // Ensure state synchronization runs if passed by parent component
+    if (onRefresh) onRefresh(); 
     onClose();
   };
 
@@ -91,12 +105,13 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
         <div className="mb-5">
           <label className="block font-bold mb-2">Despacho entregado</label>
           <select
-            defaultValue={false}
-            className="border border-gray-300 rounded-lg block w-full  p-1"
+            // Dynamically set default value based on the current object's true status
+            defaultValue={despacho.despachado}
+            className="border border-gray-300 rounded-lg block w-full p-1"
             {...register("despachado", { required: true })}
           >
-            <option value={false}>Despacho abierto</option>
-            <option value={true}>Cerrar despacho</option>
+            <option value="false">Despacho abierto</option>
+            <option value="true">Cerrar despacho</option>
           </select>
         </div>
         <div className="mb-5">
