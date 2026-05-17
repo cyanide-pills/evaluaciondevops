@@ -7,33 +7,41 @@ export const FormCierreDespacho = ({ despacho, onClose }) => {
 
   const onSubmit = async (data) => {
     console.log("onSubmit ejecutado");
+    
+    // 1. Convert form string inputs to the numeric/boolean types Hibernate expects
     const jsonData = {
-      intento: data.intento,
-      despachado: data.despachado,
+      intento: parseInt(data.intento, 10),
+      despachado: data.despachado === "true" || data.despachado === true, 
     };
 
-    console.log("Datos del formulario:", jsonData);
+    console.log("Datos del formulario enviados al Backend:", jsonData);
 
     try {
+      // 2. Safely capture the correct database ID property reference
+      const targetId = despacho.idDespacho || despacho.id_despacho;
+
       await axios.put(
-        `/api/v1/despachos/${despacho.idDespacho}`,
+        `/api/v1/despachos/${targetId}`,
         jsonData,
         {
-          headers:{
+          headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-      }
+          }
         }
       );
-      Swal.fire({
+      
+      await Swal.fire({
         title: "Despacho modificado 🛻!",
         text: "El despacho ha sido modificado exitosamente",
         icon: "success",
         confirmButtonText: "Aceptar",
       });
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.error("Error en la solicitud PUT:", error);
     }
+    
+    // This will now execute safely and close the modal window view
     onClose();
   };
 
