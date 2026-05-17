@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    container_name: despacho-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-despacho_db}
+      MYSQL_USER: ${MYSQL_USER:-despacho_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-despacho_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    restart: always
+
+volumes:
+  mysql_data:

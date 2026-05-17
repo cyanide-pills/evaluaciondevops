@@ -1,0 +1,55 @@
+name: CI/CD Proyecto Semestral - Database
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "db/**"
+      - ".github/workflows/cicd-database.yml"
+
+jobs:
+  build-push-deploy-database:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login en Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+      id: login-ecr
+
+    - name: Build imagen Database y push a ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: despacho-database
+        IMAGE_TAG: latest
+      run: |
+        cd db
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Desplegar Database vía SSM
+      run: |
+        aws ssm send-command \
+          --instance-ids ${{ secrets.EC2_DATABASE_INSTANCE_ID }} \
+          --document-name "AWS-RunShellScript" \
+          --comment "Actualizar despacho-database desde ECR" \
+          --parameters '{"commands":[
+            "set -e",
+            "export AWS_REGION=${{ secrets.AWS_REGION }}",
+            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+            "docker pull ${{ secrets.ECR_REGISTRY }}/despacho-database:latest",
+            "docker stop despacho-db || true",
+            "docker rm despacho-db || true",
+            "docker run -d --name despacho-db -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} -e MYSQL_DATABASE=despacho_db -e MYSQL_USER=${{ secrets.DB_USER }} -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} ${{ secrets.ECR_REGISTRY }}/despacho-database:latest"
+          ]}' \
+          --output text
