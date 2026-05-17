@@ -39,7 +39,7 @@ jobs:
         aws ssm send-command \
           --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
           --document-name "AWS-RunShellScript" \
-          --comment "Actualizar backend_despachos con URL Absoluta" \
+          --comment "Desplegar Backend con Componentes Corregidos" \
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
@@ -47,6 +47,12 @@ jobs:
             "sudo docker pull 206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest",
             "sudo docker stop backend_despachos || true",
             "sudo docker rm backend_despachos || true",
-            "sudo docker run -d --name backend_despachos -p 8080:8080 -e SPRING_DATASOURCE_URL=\"jdbc:mysql://${{ secrets.DATABASE_EC2_IP }}:3306/despacho_db?allowPublicKeyRetrieval=true&useSSL=false\" -e DB_USER=${{ secrets.DB_USER }} -e DB_PASSWORD=${{ secrets.MYSQL_PASSWORD }} 206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest"
+            "sudo docker run -d --name backend_despachos -p 8080:8081 \
+              -e DB_ENDPOINT=\"${{ secrets.DATABASE_EC2_IP }}\" \
+              -e DB_PORT=\"3306\" \
+              -e DB_NAME=\"despacho_db&allowPublicKeyRetrieval=true\" \
+              -e DB_USERNAME=\"${{ secrets.DB_USER }}\" \
+              -e DB_PASSWORD=\"${{ secrets.MYSQL_PASSWORD }}\" \
+              206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest"
           ]}' \
-          --output text
+           --output text
