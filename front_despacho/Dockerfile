@@ -10,17 +10,17 @@ RUN npm run build
 # Runtime stage
 FROM nginx:alpine
 
-# 1. Reemplazar la directiva PID en el archivo maestro original de Nginx
-RUN sed -i 's|pid        /var/run/nginx.pid;|pid        /tmp/nginx.pid;|g' /etc/nginx/nginx.conf
+# 1. EXPRESIÓN REGULAR UNIVERSAL: Reemplaza cualquier directiva pid por /tmp/nginx.pid
+RUN sed -i 's|^pid\s.*;|pid /tmp/nginx.pid;|g' /etc/nginx/nginx.conf
 
 # 2. Limpiar y colocar tu archivo de configuración en conf.d
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 3. Copiar los estáticos de React
+# 3. Copiar los estáticos de React desde la etapa de compilación
 COPY --from=builder /build/dist /usr/share/nginx/html
 
-# 4. Crear rutas temporales y asignar permisos al usuario nginx
+# 4. Crear rutas temporales de caché y asignar propiedad al usuario no-root 'nginx'
 RUN mkdir -p /var/cache/nginx/client_temp \
              /var/cache/nginx/proxy_temp \
              /var/cache/nginx/fastcgi_temp \
@@ -31,9 +31,10 @@ RUN mkdir -p /var/cache/nginx/client_temp \
                          /var/log/nginx \
                          /etc/nginx/conf.d
 
+# Cambiar de forma segura al usuario sin privilegios
 USER nginx
 
 EXPOSE 80
 
-# CMD limpio (el PID ya quedó modificado de raíz gracias al comando sed de arriba)
+# Comando de arranque limpio
 CMD ["nginx", "-g", "daemon off;"]
