@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # 1. BASE DE DATOS CENTRAL (MySQL)
   mysql:
     build:
       context: ./db
