@@ -37,7 +37,7 @@ jobs:
     - name: Desplegar Backend mediante AWS SSM
       run: |
         aws ssm send-command \
-          --instance-ids *** \
+          --instance-ids "${{ secrets.EC2_BACKEND_INSTANCE_ID }}" \
           --document-name "AWS-RunShellScript" \
           --comment "Desplegar Backend con credenciales" \
           --parameters '{
