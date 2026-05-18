@@ -11,10 +11,10 @@ export const FormDespachoSimple = ({ onClose, onSuccess }) => {
       fechaDespacho: data.fechaDespacho,
       patenteCamion: data.patenteCamion,
       intento: parseInt(data.intento) || 0,
-      entregado: data.entregado === "true",
+      despachado: data.despachado === "true",
       idCompra: parseInt(data.idCompra),
       direccionCompra: data.direccionCompra,
-      valorCompra: parseFloat(data.valorCompra),
+      valorCompra: parseInt(data.valorCompra),
     };
 
     console.log("Datos del formulario:", jsonData);
@@ -119,10 +119,10 @@ export const FormDespachoSimple = ({ onClose, onSuccess }) => {
         </div>
 
         <div className="mb-5">
-          <label className="block font-bold mb-2">¿Entregado?</label>
+          <label className="block font-bold mb-2">¿Despachado?</label>
           <select
             className="border border-gray-300 rounded-lg block w-full p-1"
-            {...register("entregado")}
+            {...register("despachado")}
           >
             <option value="false">No</option>
             <option value="true">Sí</option>
