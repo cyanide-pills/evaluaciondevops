@@ -38,7 +38,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         AWS_REG: ${{ secrets.AWS_REGION }}
-        DB_IP: ${{ secrets.DB_HOST_IP }}
+        DB_IP: ${{ secrets.DATABASE_EC2_IP }} 
         DB_USER: ${{ secrets.MYSQL_USER }}
         DB_PASS: ${{ secrets.MYSQL_PASSWORD }}
       run: |
