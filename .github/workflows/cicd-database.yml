@@ -3,6 +3,8 @@ name: CI/CD Proyecto Semestral - Database
 on:
   push:
     branches: [ "deploy" ]
+  # Added this to enable the manual "Run workflow" button
+  workflow_dispatch:
 
 jobs:
   build-push-deploy-database:

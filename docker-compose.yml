@@ -51,7 +51,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend-despachos # <-- Ahora solo depende de despachos
+      - backend-despachos 
     networks:
       - proyecto-network
     restart: always
