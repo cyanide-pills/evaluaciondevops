@@ -34,19 +34,28 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    - name: Desplegar Backend vía SSM
+    - name: Desplegar Backend mediante AWS SSM
       run: |
         aws ssm send-command \
-          --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
+          --instance-ids *** \
           --document-name "AWS-RunShellScript" \
-          --comment "Desplegar Backend con credenciales del Dockerfile" \
-          --parameters '{"commands":[
-            "set -e",
-            "export AWS_REGION=${{ secrets.AWS_REGION }}",
-            "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "sudo docker pull ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest",
-            "sudo docker stop backend_despachos || true",
-            "sudo docker rm backend_despachos || true",
-            "sudo docker run -d --name backend_despachos -p 8080:8080 -e SPRING_DATASOURCE_URL='\'jdbc:mysql://${{ secrets.DATABASE_EC2_IP }}:3306/despacho_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true\' -e SPRING_DATASOURCE_USERNAME='\'${{ secrets.MYSQL_USER }}\' -e SPRING_DATASOURCE_PASSWORD='\'${{ secrets.MYSQL_PASSWORD }}\' ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest"
-          ]}' \
+          --comment "Desplegar Backend con credenciales" \
+          --parameters '{
+            "commands":[
+              "set -e",
+              "export AWS_REGION=***",
+              "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin ***",
+              "sudo docker pull ***/backend_despachos:latest",
+              "sudo docker stop backend_despachos || true",
+              "sudo docker rm backend_despachos || true",
+              "sudo docker run -d --name backend_despachos -p 8080:8080 -e SPRING_DATASOURCE_URL=\"jdbc:mysql://***:3306/despacho_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true\" -e SPRING_DATASOURCE_USERNAME=\"***\" -e SPRING_DATASOURCE_PASSWORD=\"***\" ***/backend_despachos:latest"
+            ]
+          }' \
           --output text
+      shell: /usr/bin/bash -e {0}
+      env:
+        AWS_DEFAULT_REGION: ***
+        AWS_REGION: ***
+        AWS_ACCESS_KEY_ID: ***
+        AWS_SECRET_ACCESS_KEY: ***
+        AWS_SESSION_TOKEN: ***
