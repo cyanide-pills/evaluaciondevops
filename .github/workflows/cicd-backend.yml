@@ -43,8 +43,7 @@ jobs:
           --parameters '{
             "commands":[
               "set -e",
-              "export AWS_REGION=***",
-              "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin ***",
+              "aws ecr get-login-password --region *** | sudo docker login --username AWS --password-stdin ***",
               "sudo docker pull ***/backend_despachos:latest",
               "sudo docker stop backend_despachos || true",
               "sudo docker rm backend_despachos || true",
@@ -52,10 +51,3 @@ jobs:
             ]
           }' \
           --output text
-      shell: /usr/bin/bash -e {0}
-      env:
-        AWS_DEFAULT_REGION: ***
-        AWS_REGION: ***
-        AWS_ACCESS_KEY_ID: ***
-        AWS_SECRET_ACCESS_KEY: ***
-        AWS_SESSION_TOKEN: ***
