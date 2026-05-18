@@ -1,0 +1,60 @@
+name: CI/CD Proyecto Semestral - Backend Ventas
+
+on:
+  push:
+    branches: [ "deploy" ] # O la rama específica que uses para el módulo de ventas
+
+jobs:
+  build-push-deploy-ventas:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login en Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+      id: login-ecr
+
+    - name: Build imagen Ventas y push a ECR
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+        ECR_REPOSITORY: backend_ventas  # <-- Tu nuevo repositorio
+        IMAGE_TAG: latest
+      run: |
+        # Reemplaza con la ruta exacta de la carpeta de este microservicio
+        cd back-Ventas_SpringBoot/Springboot-API-REST-VENTAS 
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Desplegar Ventas mediante AWS SSM
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+        AWS_REG: ${{ secrets.AWS_REGION }}
+        DB_IP: ${{ secrets.DATABASE_EC2_IP }} 
+        DB_USER: ${{ secrets.MYSQL_USER }}
+        DB_PASS: ${{ secrets.MYSQL_PASSWORD }}
+      run: |
+        aws ssm send-command \
+          --instance-ids "${{ secrets.EC2_VENTAS_INSTANCE_ID }}" \ # <-- Tu nuevo secreto de GitHub
+          --document-name "AWS-RunShellScript" \
+          --comment "Desplegar Microservicio de Ventas en su propia EC2" \
+          --parameters '{
+            "commands":[
+              "set -e",
+              "aws ecr get-login-password --region '"$AWS_REG"' | sudo docker login --username AWS --password-stdin '"$ECR_REGISTRY"'",
+              "sudo docker pull '"$ECR_REGISTRY"'/backend_ventas:latest",
+              "sudo docker stop backend_ventas || true",
+              "sudo docker rm backend_ventas || true",
+              "sudo docker run -d --name backend_ventas -p 8080:8081 -e SPRING_DATASOURCE_URL=\"jdbc:mysql://'"$DB_IP"':3306/ventas_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true\" -e SPRING_DATASOURCE_USERNAME=\"'"$DB_USER"'\" -e SPRING_DATASOURCE_PASSWORD=\"'"$DB_PASS"'\" '"$ECR_REGISTRY"'/backend_ventas:latest"
+            ]
+          }' \
+          --output text
