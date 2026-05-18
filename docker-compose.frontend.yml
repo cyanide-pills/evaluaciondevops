@@ -5,7 +5,7 @@ services:
     build:
       context: ./front_despacho
       dockerfile: Dockerfile
-    container_name: despacho-frontend
+    container_name: front_despachos
     ports:
       - "80:80"
     restart: always

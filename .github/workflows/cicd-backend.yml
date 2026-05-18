@@ -26,7 +26,7 @@ jobs:
 
     - name: Build imagen Backend y push a ECR
       env:
-        ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: backend_despachos
         IMAGE_TAG: latest
       run: |
@@ -43,10 +43,10 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
-            "sudo aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin 206916371090.dkr.ecr.us-east-1.amazonaws.com",
-            "sudo docker pull 206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest",
+            "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+            "sudo docker pull ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest",
             "sudo docker stop backend_despachos || true",
             "sudo docker rm backend_despachos || true",
-            "sudo docker run -d --name backend_despachos -p 8081:8081 -e SPRING_DATASOURCE_URL='\''jdbc:mysql://${{ secrets.DATABASE_EC2_IP }}:3306/despacho_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true'\'' -e SPRING_DATASOURCE_USERNAME='\''${{ secrets.DB_USER }}'\'' -e SPRING_DATASOURCE_PASSWORD='\''${{ secrets.MYSQL_PASSWORD }}'\'' 206916371090.dkr.ecr.us-east-1.amazonaws.com/backend_despachos:latest"
+            "sudo docker run -d --name backend_despachos -p 8080:8080 -e SPRING_DATASOURCE_URL='\'jdbc:mysql://${{ secrets.DATABASE_EC2_IP }}:3306/despacho_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true\' -e SPRING_DATASOURCE_USERNAME='\'${{ secrets.MYSQL_USER }}\' -e SPRING_DATASOURCE_PASSWORD='\'${{ secrets.MYSQL_PASSWORD }}\' ${{ secrets.ECR_REGISTRY }}/backend_despachos:latest"
           ]}' \
           --output text

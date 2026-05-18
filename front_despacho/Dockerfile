@@ -23,7 +23,13 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY nginx.conf /etc/nginx/conf.d/
 
-# Nginx handles proxying to private backend via /api/ routes
+# Nginx alpine already runs as 'nginx' user (non-root)
+# Ensure proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /etc/nginx/conf.d/
+
+USER nginx
+
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

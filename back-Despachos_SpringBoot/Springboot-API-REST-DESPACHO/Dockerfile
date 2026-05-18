@@ -16,7 +16,17 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
+# Create non-root user
+RUN addgroup -g 1000 appuser && \
+    adduser -D -u 1000 -G appuser appuser
+
 COPY --from=builder /build/target/*.jar app.jar
+
+# Set permissions
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
 
 EXPOSE 8080
 

@@ -26,7 +26,7 @@ jobs:
 
     - name: Build imagen de Frontend y push a ECR
       env:
-        ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: front_despachos
         IMAGE_TAG: latest
       run: |
@@ -44,10 +44,10 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
-            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 206916371090.dkr.ecr.us-east-1.amazonaws.com",
-            "docker pull 206916371090.dkr.ecr.us-east-1.amazonaws.com/front_despachos:latest",
+            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+            "docker pull ${{ secrets.ECR_REGISTRY }}/front_despachos:latest",
             "docker stop front_despachos || true",
             "docker rm front_despachos || true",
-            "docker run -d --name front_despachos -p 80:80 206916371090.dkr.ecr.us-east-1.amazonaws.com/front_despachos:latest"
+            "docker run -d --name front_despachos -p 80:80 ${{ secrets.ECR_REGISTRY }}/front_despachos:latest"
           ]}' \
           --output text

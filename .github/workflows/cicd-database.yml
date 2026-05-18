@@ -26,7 +26,7 @@ jobs:
 
     - name: Build imagen de Database y push a ECR
       env:
-        ECR_REGISTRY: 206916371090.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         ECR_REPOSITORY: db
         IMAGE_TAG: latest
       run: |
@@ -43,10 +43,10 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "export AWS_REGION=${{ secrets.AWS_REGION }}",
-            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 206916371090.dkr.ecr.us-east-1.amazonaws.com",
-            "docker pull 206916371090.dkr.ecr.us-east-1.amazonaws.com/db:latest",
+            "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+            "docker pull ${{ secrets.ECR_REGISTRY }}/db:latest",
             "docker stop db || true",
             "docker rm db || true",
-            "docker run -d --name db -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} -e MYSQL_DATABASE=despacho_db -e MYSQL_USER=${{ secrets.DB_USER }} -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} 206916371090.dkr.ecr.us-east-1.amazonaws.com/db:latest"
+            "docker run -d --name db -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} -e MYSQL_DATABASE=despacho_db -e MYSQL_USER=${{ secrets.MYSQL_USER }} -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} ${{ secrets.ECR_REGISTRY }}/db:latest"
           ]}' \
           --output text
